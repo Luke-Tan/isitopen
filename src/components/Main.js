@@ -28,22 +28,15 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import io from "socket.io-client";
-
-import Collections from './components/Collections'
-
-// Redux
 import { connect } from 'react-redux';
-import {
-	fetchCollections,
-	createCollection,
-	addToCollection
-} from './actions/collectionAction';
 
-import socket from './socket.js'
 
 const SECONDS_IN_DAY = 24 * 60 * 60
 const DAYS = ['Mon', 'Tue' , 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const TEN_AM = 10 * 60 * 60 // Default starting filter time
+
+const socket = io('http://localhost:8080');
+socket.connect();
 
 class ListExampleBasic extends Component {
   timer;
@@ -66,8 +59,8 @@ class ListExampleBasic extends Component {
     emailRecipients: [""],
     modalRestaurantCollection: {},
   }
-  constructor(props){
-  	super(props);
+  constructor(){
+  	super();
   	let selectedDays = {}
   	// Create an obj that holds all of the days with a corresponding checked value, default all to true
   	DAYS.forEach(day => selectedDays[day] = true )
@@ -94,26 +87,54 @@ class ListExampleBasic extends Component {
     	collectionIds = JSON.stringify(collectionIds);
     	localStorage.setItem('collectionIds',collectionIds);
     }
-
-    this.props.fetchCollections(collectionIds);
-
     axios.get('http://localhost:8080/api/GetRestaurantCollections',{
     	params: {
     		collectionIds: collectionIds
     	}
     })
-    .then(response => {
-      const { data } = response;
-      this.setState({ myCollections:data })
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-
+      .then(response => {
+        const { data } = response;
+        console.log(data)
+        this.setState({ myCollections:data })
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   }
 
   componentDidMount() {
     socket.emit('initialSubscription', JSON.parse(localStorage.getItem('collectionIds')));
+    socket.on("restaurantAdded", data => {
+	    const {restaurant, collectionId} = data;
+	    console.log("I was emitted to!");
+	    const myCollections  = [...this.state.myCollections];
+	    for(let collection of myCollections){
+	    	if(collection._id === collectionId){
+	    		collection.restaurants.push(restaurant)
+	    		break
+	    	}	    	
+	    }
+	    this.setState({
+	    	myCollections: [
+	    		...myCollections
+	    	]
+	    })
+    });
+
+    socket.on("restaurantRemoved", data => {
+	  	let {myCollections} = this.state;
+	  	const {collectionId, restaurantId} = data;
+	  	let collectionIndex = myCollections.findIndex(collection => collection._id == collectionId);
+	  	let restaurants = [...(myCollections[collectionIndex].restaurants)]; //Create a clone so we don't mess up when using splice
+	  	let restaurantIndex = restaurants.findIndex(restaurant => restaurant._id === restaurantId);
+	  	restaurants.splice(restaurantIndex, 1);
+	  	myCollections[collectionIndex].restaurants = restaurants;
+	  	this.setState({
+	  		myCollections
+	  	})
+    });
+    
+    socket.on("collectionDeleted", data => this.setState({ response: data }));
     socket.on("collectionRenamed", data => this.setState({ response: data }));
   }
 
@@ -248,8 +269,24 @@ class ListExampleBasic extends Component {
 
 		//This creates a new collection
 		if(newCollectionName){
-			this.props.createCollection(newCollectionName, modalId);
+			axios.post('http://localhost:8080/api/CreateRestaurantCollection', {
+			    name: newCollectionName,
+			    restaurantId: modalId
+			  })
+			  .then((response) => {
+
+					let storedCollectionIds = JSON.parse(localStorage.getItem('collectionIds')) || [];
+					storedCollectionIds.push(response.data._id);
+					localStorage.setItem('collectionIds', JSON.stringify(storedCollectionIds));
+	        this.setState({
+	          myCollections: [...this.state.myCollections, response.data]
+	        })
+			  })
+			  .catch(function (error) {
+			    console.log(error);
+			  });
 		}
+
 		this.closeAddRestaurantModal();
 	}
 
@@ -271,6 +308,10 @@ class ListExampleBasic extends Component {
 		    collectionId,
 		  })
 		  .then((response) => {
+		  	const {myCollections} = this.state;
+		  	let collectionIndex = myCollections.findIndex(collection => collection._id == collectionId);
+		  	myCollections.splice(collectionIndex,1)
+		  	this.setState({myCollections})
 		  })
 		  .catch(function (error) {
 		    console.log(error);
@@ -309,7 +350,10 @@ class ListExampleBasic extends Component {
 		    collection: modalRestaurantCollection
 		  })
 		  .then((response) => {
-		  	//
+		  	// const {myCollections} = this.state;
+		  	// let collectionIndex = myCollections.findIndex(collection => collection._id == collectionId);
+		  	// myCollections.splice(collectionIndex,1)
+		  	// this.setState({myCollections})
 		  })
 		  .catch(function (error) {
 		    console.log(error);
@@ -384,7 +428,56 @@ class ListExampleBasic extends Component {
 			      </Container>
 				  </Tab>
 				  <Tab eventKey="collections" title="Collections">
-				  	<Collections/>
+						<Container style={{}}>
+							{/*<Row style={{paddingTop:'25px'}}>
+							  <Button style={{fontWeight:'600'}} variant="primary" size="lg" block>
+							  	<FontAwesomeIcon style={{marginRight:'5px'}}icon={faPlus} />
+							    Create new collection
+							  </Button>
+						  </Row>*/}
+						  <Row>
+						  	{
+						  		this.state.myCollections.map((collection, index) => (
+								    <Col key={`restaurant-collection-${index}`} sm={4}>
+									    <Card style={{ margin:'25px' }}>
+											  <Card.Header style={{wordBreak:'break-all',display:'flex', alignItems:'center'}}>
+											  	{collection.name}
+											  	<FontAwesomeIcon 
+											  		onClick={()=>{this.deleteCollection(collection._id)}}
+											  		style={{color:'red',cursor:'pointer',display:'block',marginLeft:'auto'}}
+											  		icon={faTrash} 
+										  		/>
+										  	</Card.Header>
+											  <ListGroup variant="flush">
+											    {
+											    	collection.restaurants.map((restaurant, innerIndex)=>(
+											    		<ListGroup.Item style={{wordBreak:'break-all',display:'flex', alignItems:'center'}} key={`restaurant-collection-${index}-${innerIndex}`}>
+											    			{restaurant.name}
+															  	<FontAwesomeIcon 
+															  		onClick={()=>{this.removeFromCollection(collection._id, restaurant._id)}}
+															  		style={{color:'red',cursor:'pointer',display:'block',marginLeft:'auto'}}
+															  		icon={faMinusCircle} 
+														  		/>
+											    		</ListGroup.Item>
+											    	))
+											    }
+											  </ListGroup>
+											  <Card.Footer 
+											  	onClick={()=>{this.shareRestaurantCollection(collection)}}
+											  	style={{display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',backgroundColor:'rgb(91, 168, 251)', color:'white', textAlign:'center',borderTop: '0px'}}
+										  	>
+											  	<FontAwesomeIcon 
+											  		style={{color:'white',marginRight:'10px'}}
+											  		icon={faEnvelope} 
+										  		/>
+											  	Share
+										  	</Card.Footer>
+											</Card>
+										</Col>
+						  		))
+						  	}
+						  </Row>
+						</Container>
 				  </Tab>
 				</Tabs>
 	      <Modal show={this.state.showAddRestaurantModal} onHide={this.closeAddRestaurantModal}>
@@ -393,7 +486,7 @@ class ListExampleBasic extends Component {
 	        </Modal.Header>
 	        <Modal.Body>
 	        	<Form.Control id="new-collection-input" placeholder="New collection" />
-			    	{ this.props.collections.map((collection,index) => {
+			    	{ this.state.myCollections.map((collection,index) => {
 	        		const { _id, name } = collection;
 	        		return (
 	        			<ListGroup key={`collection-${_id}`} horizontal style={{height:'38px',flex:1, marginTop:'10px'}}>
@@ -459,22 +552,14 @@ class ListExampleBasic extends Component {
 }
 
 const mapStateToProps = state => ({
-	collections: state.collectionReducer.collections,
+	plans: state.PlanReducer.plans,
+  user: state.AccountReducer.user
 });
 
 const mapDispatchToProps = dispatch => ({
 	updateMessages: (data) => {
 		// dispatch(removeFromCollection(messages));
 	},
-	fetchCollections: (collectionIds) => {
-		dispatch(fetchCollections(collectionIds))
-	},
-	createCollection: (name, restaurantId) => {
-		dispatch(createCollection(name, restaurantId))
-	},
-	addToCollection: (collectionIds, restaurantId) => {
-		dispatch(addToCollection(collectionIds, restaurantId))
-	}
 });
 
 export default connect(
