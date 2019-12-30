@@ -102,29 +102,37 @@ export default class ListExampleBasic extends Component {
   }
 
   componentDidMount() {
-    socket.emit('login', JSON.parse(localStorage.getItem('collectionIds')));
+    socket.emit('initialSubscription', JSON.parse(localStorage.getItem('collectionIds')));
     socket.on("restaurantAdded", data => {
-	    const {restaurant, collectionIds} = data;
+	    const {restaurant, collectionId} = data;
 	    console.log("I was emitted to!");
 	    const myCollections  = [...this.state.myCollections];
-	    myCollections.forEach(collection=>{
-	    	for(let i = 0; i< collectionIds.length; i++){
-	    		const id = collectionIds[i];
-	    		if(collection._id === id){
-	    			collection.restaurants.push(restaurant);
-	    			collectionIds.splice(i,1);
-	    			break;
-	    		}
-	    	}
-	    })
-	    console.log(myCollections)
+	    for(let collection of myCollections){
+	    	if(collection._id === collectionId){
+	    		collection.restaurants.push(restaurant)
+	    		break
+	    	}	    	
+	    }
 	    this.setState({
 	    	myCollections: [
 	    		...myCollections
 	    	]
 	    })
     });
-    socket.on("restaurantRemoved", data => this.setState({ response: data }));
+
+    socket.on("restaurantRemoved", data => {
+	  	let {myCollections} = this.state;
+	  	const {collectionId, restaurantId} = data;
+	  	let collectionIndex = myCollections.findIndex(collection => collection._id == collectionId);
+	  	let restaurants = [...(myCollections[collectionIndex].restaurants)]; //Create a clone so we don't mess up when using splice
+	  	let restaurantIndex = restaurants.findIndex(restaurant => restaurant._id === restaurantId);
+	  	restaurants.splice(restaurantIndex, 1);
+	  	myCollections[collectionIndex].restaurants = restaurants;
+	  	this.setState({
+	  		myCollections
+	  	})
+    });
+    
     socket.on("collectionDeleted", data => this.setState({ response: data }));
     socket.on("collectionRenamed", data => this.setState({ response: data }));
   }
@@ -264,7 +272,8 @@ export default class ListExampleBasic extends Component {
 			    name: newCollectionName,
 			    restaurantId: modalId
 			  })
-			  .then( (response) => {
+			  .then((response) => {
+
 					let storedCollectionIds = JSON.parse(localStorage.getItem('collectionIds')) || [];
 					storedCollectionIds.push(response.data._id);
 					localStorage.setItem('collectionIds', JSON.stringify(storedCollectionIds));
@@ -286,17 +295,7 @@ export default class ListExampleBasic extends Component {
 		    restaurantId
 		  })
 		  .then((response) => {
-		  	let {myCollections} = this.state;
-		  	let collectionIndex = myCollections.findIndex(collection => collection._id == collectionId);
-		  	let restaurants = [...(myCollections[collectionIndex].restaurants)]; //Create a clone so we don't mess up when using splice
-		  	let restaurantIndex = restaurants.findIndex(restaurant => restaurant._id === restaurantId);
-		  	restaurants.splice(restaurantIndex, 1);
-		  	console.log(restaurants)
-		  	myCollections[collectionIndex].restaurants = restaurants;
-		  	console.log(myCollections);
-		  	this.setState({
-		  		myCollections
-		  	})
+		  	//pass
 		  })
 		  .catch(function (error) {
 		    console.log(error);
@@ -358,6 +357,7 @@ export default class ListExampleBasic extends Component {
 		  .catch(function (error) {
 		    console.log(error);
 		  });
+		this.closeShareModal();
 	}
 
   render(){
