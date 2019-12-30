@@ -55,6 +55,7 @@ export default class ShareCollectionModal extends Component {
 	        	{
 	        		this.state.emailRecipients.map((email,index)=>
 	        			<Form.Control 
+	        				key={`share-email-input-${index}`}
 	        				onChange={this.handleEmailChange}
 	        				value={email} 
 	        				id={`share-email-input-${index}`}

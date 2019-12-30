@@ -6,10 +6,7 @@ import {
 	ADDED_TO_COLLECTION,
 	FETCH_COLLECTIONS,
 	CREATE_COLLECTION,
-	ADD_TO_COLLECTION,
-	DELETE_COLLECTION,
-	REMOVE_FROM_COLLECTION
-} from '../constants.js'
+} from '../actionTypes'
 
 import axios from 'axios';
 

@@ -8,7 +8,6 @@ import {
 } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
-	faPlus,
 	faMinusCircle,
 	faTrash,
 	faEnvelope

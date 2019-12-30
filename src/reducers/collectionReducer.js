@@ -6,7 +6,7 @@ import {
 	ADDED_TO_COLLECTION,
 	CREATE_COLLECTION,
 	FETCH_COLLECTIONS
-} from '../constants.js'
+} from '../actionTypes'
 
 let initialState = {
 	collections: []  
@@ -23,7 +23,7 @@ export default (state = initialState, action) => {
 		case REMOVED_FROM_COLLECTION: {
 			const { collectionId, restaurantId } = action.payload;
 			let collections  = [...state.collections];
-		  	let collectionIndex = collections.findIndex(collection => collection._id == collectionId);
+		  	let collectionIndex = collections.findIndex(collection => collection._id === collectionId);
 		  	let restaurants = [...(collections[collectionIndex].restaurants)]; //Create a clone so we don't mess up when using splice
 		  	let restaurantIndex = restaurants.findIndex(restaurant => restaurant._id === restaurantId);
 		  	restaurants.splice(restaurantIndex, 1);
@@ -50,11 +50,8 @@ export default (state = initialState, action) => {
 		}
 		case DELETED_COLLECTION: {
 			const { collectionId } = action.payload;
-			console.log(action.payload)
-			console.log(collectionId);
 		  	let collections = [...state.collections];
-		  	console.log(collections);
-		  	let collectionIndex = collections.findIndex(collection => collection._id == collectionId);
+		  	let collectionIndex = collections.findIndex(collection => collection._id === collectionId);
 		  	collections.splice(collectionIndex,1)
 		  	console.log(collections);
 		  	return {
