@@ -58,27 +58,6 @@ export const deletedCollection = (data) => {
 	}
 }
 
-export const addToCollection = (data) => {
-	axios.post('http://localhost:8080/api/AddToRestaurantCollections', {
-	    collectionIds: JSON.stringify(collectionIds),
-	    restaurantId: modalId
-	  })
-	  .then( response => {
-	  	// pass
-	  })
-	  .catch(function (error) {
-	    console.log(error);
-	  });
-	const { restaurant, collectionId } = data;
-	return{
-		type: ADD_TO_COLLECTION,
-		payload: {
-			restaurant,
-			collectionId
-		}
-	}
-}
-
 export const createCollection = (name, restaurantId) => dispatch => {
 	axios.post('http://localhost:8080/api/CreateRestaurantCollection', {
 	    name,
