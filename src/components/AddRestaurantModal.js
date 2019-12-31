@@ -11,13 +11,11 @@ import { createCollection } from '../actions/collectionAction'
 
 class AddRestaurantModal extends Component {
 	state = {
-		title: '',
 		checkboxes: {}
 	}
 	
 	closeAddRestaurantModal = () => {
 		this.setState({
-			title:'',
 			checkboxes: {},
 		})
 	}
@@ -37,7 +35,7 @@ class AddRestaurantModal extends Component {
 
 	addToCollections = () => {
 		const { checkboxes } = this.state
-		const { modalId } = this.props
+		const { id } = this.props
 		const newCollectionName = document.getElementById('new-collection-input').value;
 		let collectionIds = [];
 		for(let key in checkboxes){
@@ -45,7 +43,7 @@ class AddRestaurantModal extends Component {
 		}
 		axios.post('http://localhost:8080/api/AddToRestaurantCollections', {
 		    collectionIds: JSON.stringify(collectionIds),
-		    restaurantId: modalId
+		    restaurantId: id
 		  })
 		  .then( response => {
 		  	// pass
@@ -56,7 +54,7 @@ class AddRestaurantModal extends Component {
 
 		//This creates a new collection
 		if(newCollectionName){
-			this.props.createCollection(newCollectionName, modalId);
+			this.props.createCollection(newCollectionName, id);
 		}
 		this.props.closeModal();
 	}
@@ -65,7 +63,7 @@ class AddRestaurantModal extends Component {
 		return(
 	      <Modal show={this.props.showModal} onHide={this.props.closeModal}>
 	        <Modal.Header closeButton>
-	          <Modal.Title>{this.state.title}</Modal.Title>
+	          <Modal.Title>{this.props.title}</Modal.Title>
 	        </Modal.Header>
 	        <Modal.Body>
 	        	<Form.Control id="new-collection-input" placeholder="New collection" />

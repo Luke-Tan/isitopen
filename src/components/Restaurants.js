@@ -25,7 +25,8 @@ class Restaurants extends Component {
   timer;
 
   state = {
-    time: TEN_AM,
+  	time: TEN_AM,
+    toggleTime: false,
     searchedName: '',
     selectedDays: {},
     items: [],
@@ -89,7 +90,7 @@ class Restaurants extends Component {
 
 	filterRestaurants = () =>{
 	  let filteredRestaurants = []
-	  let { items, searchedName, time, selectedDays} = this.state 
+	  let { items, searchedName, time, selectedDays, toggleTime } = this.state 
 	  for (let i = 0; i < items.length; i++) {
 	  	const name = items[i]['name'].toLowerCase();
 	  	let timeFound = false;
@@ -104,7 +105,7 @@ class Restaurants extends Component {
 			  	}
 			  	// Then, filter by the selected time
 	    		// We aren't sure which 'day' the specified time lands on, so we check both and return a match if either is satisfied
-	    	  const withinTimeRange = ((start <= time && end >= time) || (start <= time+SECONDS_IN_DAY && end >= time+SECONDS_IN_DAY));
+	    	  const withinTimeRange = ((start <= time && end >= time) || (start <= time+SECONDS_IN_DAY && end >= time+SECONDS_IN_DAY)) || !toggleTime;
 	    	  timeFound = withinTimeRange;
 	    	  if(timeFound) break;	  			
 	  		}
@@ -117,6 +118,15 @@ class Restaurants extends Component {
 	    }
 	  }  	
 	  this.setState({filteredRestaurants})
+	}
+
+	toggleTime = (event) => {
+		const { checked } = event.target;
+		this.setState({
+			toggleTime: checked
+		}, () => {
+			this.filterRestaurants();
+		})
 	}
 
 	showModal = (restaurant) => {
@@ -164,43 +174,58 @@ class Restaurants extends Component {
 		const MyVirtualList = VirtualList()(this.MyList)
 		return(
 			<div>
-	      <Container style={{paddingTop:'20px', paddingBottom:'20px'}}>
-	      	<div>
-					  <Form.Group controlId="formBasicName">
-					    <Form.Label>Search</Form.Label>
-					    <Form.Control onChange={this.filterName} placeholder="Restaurant Name" />
-					  </Form.Group>
-						<Form>
-						    <div className="mb-3">
-						    	{ DAYS.map((day,index) => (
-						      	<Form.Check 
-						      		checked={this.state.selectedDays[day]} 
-						      		onChange={this.filterDay}
-						      		key={`checkbox-${day}`} 
-						      		data-day={day}
-						      		inline 
-						      		label={day} 
-						      		type={'checkbox'} 
-						      		id={`checkbox-${day}`} 
-						      	/>
-						      ))}
-						    </div>
-						</Form>
-		        <TimePicker onChange={this.filterTime} value={this.state.time} start="00:00" end="23:59" step={30} />
-	        </div>
-	        <h3 style={{marginTop:'20px', marginBottom:'20px', textAlign:'center'}}> Restaurants </h3>
-					<MyVirtualList
-					  items={this.state.filteredRestaurants}
-					  itemHeight={85}
+	        <Container style={{paddingTop:'20px', paddingBottom:'20px'}}>
+		      	<div>
+						  <Form.Group controlId="formBasicName">
+						    <Form.Label>Search</Form.Label>
+						    <Form.Control onChange={this.filterName} placeholder="Restaurant Name" />
+						  </Form.Group>
+							<Form>
+							    <div className="mb-3">
+							    	{ DAYS.map((day,index) => (
+							      	<Form.Check 
+							      		checked={this.state.selectedDays[day]} 
+							      		onChange={this.filterDay}
+							      		key={`checkbox-${day}`} 
+							      		data-day={day}
+							      		inline 
+							      		label={day} 
+							      		type={'checkbox'} 
+							      		id={`checkbox-${day}`} 
+							      	/>
+							      ))}
+							    </div>
+							</Form>
+			      	<Form.Check 
+			      		checked={this.state.toggleTime}
+			      		onChange={this.toggleTime} 
+			      		inline 
+			      		label={'Time'} 
+			      		type={'checkbox'} 
+			      	/>
+			        <TimePicker 
+			        	disabled={!this.state.toggleTime} 
+			        	style={{display:'inline-block', width:'90%'}} 
+			        	onChange={this.filterTime} 
+			        	value={this.state.time} 
+			        	start="00:00" 
+			        	end="23:59" 
+			        	step={30} 
+		        	/>
+		        </div>
+	        	<h3 style={{marginTop:'20px', marginBottom:'20px', textAlign:'center'}}> Restaurants </h3>
+						<MyVirtualList
+						  items={this.state.filteredRestaurants}
+						  itemHeight={85}
+						/>
+	        </Container>
+					<AddRestaurantModal
+						showModal={this.state.showModal}
+						title={this.state.modalTitle}
+						id={this.state.modalId}
+						closeModal={this.closeModal}
 					/>
-	      </Container>
-      	<AddRestaurantModal
-      		showModal={this.state.showModal}
-      		modalTitle={this.state.modalTitle}
-      		modalId={this.state.modalId}
-      		closeModal={this.closeModal}
-      	/>
-      </div>
+        </div>
 		)
 	}
 }

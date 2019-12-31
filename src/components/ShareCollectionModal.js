@@ -70,9 +70,6 @@ export default class ShareCollectionModal extends Component {
 	          </Button>
 	        </Modal.Body>
 	        <Modal.Footer>
-	          <Button variant="secondary" onClick={this.closeShareModal}>
-	            Close
-	          </Button>
 	          <Button variant="primary" onClick={this.shareCollection}>
 	            Share
 	          </Button>

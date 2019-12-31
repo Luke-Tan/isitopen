@@ -18,9 +18,6 @@ import {
 	fetchCollections,
 } from './actions/collectionAction';
 
-//Socket.io
-import socket from './socket.js'
-
 class App extends Component {
   render(){
     return(
