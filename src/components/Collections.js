@@ -1,3 +1,4 @@
+//Npm imports
 import React , { Component } from 'react';
 import {
 	Container,
@@ -13,14 +14,36 @@ import {
 	faEnvelope
 } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios';
+//Redux
 import { connect } from 'react-redux'
-
+import { fetchCollections } from '../actions/collectionAction'
+//Components
 import ShareCollectionModal from './ShareCollectionModal'
+//Socket.io
+import socket from '../socket'
 
 class Collections extends Component {
 	state = {
 		modalCollection: {},
 		showModal: false
+	}
+
+	constructor(props){
+		super(props);
+    //Add invited collection by url param to localstorage
+		const urlParams = new URLSearchParams(window.location.search);
+		const invitedCollection = urlParams.get('invitedCollection'); 
+    let collectionIds = localStorage.getItem('collectionIds') || "[]";
+    if(invitedCollection){
+    	collectionIds = JSON.parse(collectionIds);
+    	if(!collectionIds.includes(invitedCollection)) collectionIds.push(invitedCollection);
+    	collectionIds = JSON.stringify(collectionIds);
+    	localStorage.setItem('collectionIds',collectionIds);
+    }
+    //Subscribe to changes to all owned collections
+    socket.emit('initialSubscription', JSON.parse(localStorage.getItem('collectionIds')));
+    //Fetch the collections and load into redux state
+    this.props.fetchCollections(collectionIds);
 	}
 
 	removeFromCollection = (collectionId, restaurantId) => {
@@ -128,6 +151,9 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
+	fetchCollections: (collectionIds) => {
+		dispatch(fetchCollections(collectionIds))
+	},
 });
 
 export default connect(

@@ -1,4 +1,4 @@
-//Npm imports
+// Npm imports
 import React , { Component } from 'react';
 import {
 	Container,

@@ -53,7 +53,6 @@ export default (state = initialState, action) => {
 		  	let collections = [...state.collections];
 		  	let collectionIndex = collections.findIndex(collection => collection._id === collectionId);
 		  	collections.splice(collectionIndex,1)
-		  	console.log(collections);
 		  	return {
 		  		...state,
 		  		collections

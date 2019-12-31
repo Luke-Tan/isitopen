@@ -1,10 +1,14 @@
+//Npm imports
 import React , { Component } from 'react'
 import {
 	Tabs,
 	Tab
 } from 'react-bootstrap';
+
+//CSS
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+//Components
 import Collections from './components/Collections'
 import Restaurants from './components/Restaurants'
 
@@ -14,47 +18,10 @@ import {
 	fetchCollections,
 } from './actions/collectionAction';
 
+//Socket.io
 import socket from './socket.js'
 
-class ListExampleBasic extends Component {
-  state = {
-
-    showShareModal: false,
-    emailRecipients: [""],
-    modalRestaurantCollection: {},
-  }
-  constructor(props){
-  	super(props);
-
-    // axios.get('http://localhost:8080/api/GetData')
-    //   .then(response => {
-    //     const { data } = response;
-    //     this.setState({
-    //       items:data,
-    //       filteredRestaurants:data
-    //     })
-    //   })
-    //   .catch(function (error) {
-    //     console.log(error);
-    //   });
-
-		const urlParams = new URLSearchParams(window.location.search);
-		const invitedCollection = urlParams.get('invitedCollection'); 
-    let collectionIds = localStorage.getItem('collectionIds') || "[]";
-    if(invitedCollection){
-    	collectionIds = JSON.parse(collectionIds);
-    	if(!collectionIds.includes(invitedCollection)) collectionIds.push(invitedCollection);
-    	collectionIds = JSON.stringify(collectionIds);
-    	localStorage.setItem('collectionIds',collectionIds);
-    }
-
-    this.props.fetchCollections(collectionIds);
-  }
-
-  componentDidMount() {
-    socket.emit('initialSubscription', JSON.parse(localStorage.getItem('collectionIds')));
-  }
-
+class App extends Component {
   render(){
     return(
     	<div>
@@ -87,4 +54,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(ListExampleBasic);
+)(App);

@@ -45,8 +45,11 @@ export const renamedCollection = (bot) => dispatch => {
 
 export const deletedCollection = (data) => {
 	const { collectionId } = data;
-	console.log(data);
-	console.log(collectionId)
+	// Remove the key from localstorage but not technically necessary
+	const collectionIds = JSON.parse(localStorage.getItem('collectionIds')) || [];
+	const collectionIdIndex = collectionIds.findIndex(collection => collection._id === collectionId);
+	collectionIds.splice(collectionIdIndex, 1);
+	localStorage.setItem('collectionIds', JSON.stringify(collectionIds));
 	return {
 		type: DELETED_COLLECTION,
 		payload: {
