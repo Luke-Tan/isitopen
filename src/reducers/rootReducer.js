@@ -1,6 +1,6 @@
-import { combineReducers } from 'redux';
-import collectionReducer from './collectionReducer';
+import { combineReducers } from "redux"
+import collectionReducer from "./collectionReducer"
 
 export default combineReducers({
-	collectionReducer
-});
+  collectionReducer
+})

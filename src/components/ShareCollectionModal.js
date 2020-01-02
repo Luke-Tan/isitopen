@@ -1,46 +1,45 @@
-import React, { Component } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import React, { Component } from "react"
+import { Modal, Button, Form } from "react-bootstrap"
 
-import axios from "axios";
+import axios from "axios"
 
 export default class ShareCollectionModal extends Component {
   state = {
     emailRecipients: [""],
-    modalRestaurantCollection: {}
-  };
+  }
 
   addEmailRecipient = () => {
     this.setState({
       emailRecipients: [...this.state.emailRecipients, ""]
-    });
-  };
+    })
+  }
 
   handleEmailChange = event => {
-    const { emailRecipients } = this.state;
-    const { index } = event.target.dataset;
-    const { value } = event.target;
-    emailRecipients[index] = value;
+    const { emailRecipients } = this.state
+    const { index } = event.target.dataset
+    const { value } = event.target
+    emailRecipients[index] = value
     this.setState({
       emailRecipients
-    });
-  };
+    })
+  }
 
   shareCollection = () => {
-    const { emailRecipients, modalRestaurantCollection } = this.state;
-    console.log(modalRestaurantCollection);
+    const { emailRecipients } = this.state
+    const { collection } = this.props
     axios
       .post("http://localhost:8080/api/InviteFriends", {
         emails: emailRecipients,
-        collection: modalRestaurantCollection
+        collection
       })
       .then(response => {
         //
       })
       .catch(function(error) {
-        console.log(error);
-      });
-    this.props.closeModal();
-  };
+        console.log(error)
+      })
+    this.props.closeModal()
+  }
 
   render() {
     return (
@@ -70,6 +69,6 @@ export default class ShareCollectionModal extends Component {
           </Button>
         </Modal.Footer>
       </Modal>
-    );
+    )
   }
 }

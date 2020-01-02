@@ -1,41 +1,41 @@
-import React, { Component } from "react";
-import { Modal, ListGroup, Form, Button } from "react-bootstrap";
-import axios from "axios";
-import { connect } from "react-redux";
-import { createCollection } from "../actions/collectionAction";
+import React, { Component } from "react"
+import { Modal, ListGroup, Form, Button } from "react-bootstrap"
+import axios from "axios"
+import { connect } from "react-redux"
+import { createCollection } from "../actions/collectionAction"
 
 class AddRestaurantModal extends Component {
   state = {
     checkboxes: {}
-  };
+  }
 
   closeAddRestaurantModal = () => {
     this.setState({
       checkboxes: {}
-    });
-  };
+    })
+  }
 
   handleChange = event => {
-    const { checkboxes } = this.state;
-    const { id } = event.target.dataset;
-    console.log(id);
-    const { checked } = event.target;
+    const { checkboxes } = this.state
+    const { id } = event.target.dataset
+    console.log(id)
+    const { checked } = event.target
     this.setState({
       checkboxes: {
         ...checkboxes,
         [id]: checked
       }
-    });
-  };
+    })
+  }
 
   addToCollections = () => {
-    const { checkboxes } = this.state;
-    const { id } = this.props;
+    const { checkboxes } = this.state
+    const { id } = this.props
     const newCollectionName = document.getElementById("new-collection-input")
-      .value;
-    let collectionIds = [];
+      .value
+    let collectionIds = []
     for (let key in checkboxes) {
-      if (checkboxes[key]) collectionIds.push(key);
+      if (checkboxes[key]) collectionIds.push(key)
     }
     axios
       .post("http://localhost:8080/api/AddToRestaurantCollections", {
@@ -46,15 +46,15 @@ class AddRestaurantModal extends Component {
         // pass
       })
       .catch(function(error) {
-        console.log(error);
-      });
+        console.log(error)
+      })
 
     //This creates a new collection
     if (newCollectionName) {
-      this.props.createCollection(newCollectionName, id);
+      this.props.createCollection(newCollectionName, id)
     }
-    this.props.closeModal();
-  };
+    this.props.closeModal()
+  }
 
   render() {
     return (
@@ -68,7 +68,7 @@ class AddRestaurantModal extends Component {
             placeholder="New collection"
           />
           {this.props.collections.map((collection, index) => {
-            const { _id, name } = collection;
+            const { _id, name } = collection
             return (
               <ListGroup
                 key={`collection-${_id}`}
@@ -94,7 +94,7 @@ class AddRestaurantModal extends Component {
                   />
                 </ListGroup.Item>
               </ListGroup>
-            );
+            )
           })}
         </Modal.Body>
         <Modal.Footer>
@@ -106,21 +106,21 @@ class AddRestaurantModal extends Component {
           </Button>
         </Modal.Footer>
       </Modal>
-    );
+    )
   }
 }
 
 const mapStateToProps = state => ({
   collections: state.collectionReducer.collections
-});
+})
 
 const mapDispatchToProps = dispatch => ({
   createCollection: (name, restaurantId) => {
-    dispatch(createCollection(name, restaurantId));
+    dispatch(createCollection(name, restaurantId))
   }
-});
+})
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(AddRestaurantModal);
+)(AddRestaurantModal)

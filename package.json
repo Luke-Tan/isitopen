@@ -31,7 +31,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "format": "prettier --write ./src/*.js ./src/actions/*.js ./src/components/*.js ./reducers/components/*.js"
+    "format": "prettier --write --no-semi ./src/*.js ./src/actions/*.js ./src/components/*.js ./src/reducers/*.js"
   },
   "eslintConfig": {
     "extends": "react-app"

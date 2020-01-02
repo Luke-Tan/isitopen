@@ -1,17 +1,17 @@
 //Npm imports
-import React, { Component } from "react";
-import { Tabs, Tab } from "react-bootstrap";
+import React, { Component } from "react"
+import { Tabs, Tab } from "react-bootstrap"
 
 //CSS
-import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/css/bootstrap.min.css"
 
 //Components
-import Collections from "./components/Collections";
-import Restaurants from "./components/Restaurants";
+import Collections from "./components/Collections"
+import Restaurants from "./components/Restaurants"
 
 // Redux
-import { connect } from "react-redux";
-import { fetchCollections } from "./actions/collectionAction";
+import { connect } from "react-redux"
+import { fetchCollections } from "./actions/collectionAction"
 
 class App extends Component {
   render() {
@@ -32,19 +32,19 @@ class App extends Component {
           </Tab>
         </Tabs>
       </div>
-    );
+    )
   }
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({})
 
 const mapDispatchToProps = dispatch => ({
   fetchCollections: collectionIds => {
-    dispatch(fetchCollections(collectionIds));
+    dispatch(fetchCollections(collectionIds))
   }
-});
+})
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(App);
+)(App)

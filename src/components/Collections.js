@@ -1,47 +1,53 @@
 //Npm imports
-import React, { Component } from "react";
-import { Container, Col, Card, ListGroup, Row } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { Component } from "react"
+import { Container, Col, Card, ListGroup, Row } from "react-bootstrap"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faMinusCircle,
   faTrash,
-  faEnvelope
-} from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
+  faEnvelope,
+  faEdit
+} from "@fortawesome/free-solid-svg-icons"
+import axios from "axios"
 //Redux
-import { connect } from "react-redux";
-import { fetchCollections } from "../actions/collectionAction";
+import { connect } from "react-redux"
+import { fetchCollections } from "../actions/collectionAction"
 //Components
-import ShareCollectionModal from "./ShareCollectionModal";
+import ShareCollectionModal from "./ShareCollectionModal"
+import RenameCollectionModal from "./RenameCollectionModal"
 //Socket.io
-import socket from "../socket";
+import socket from "../socket"
 
 class Collections extends Component {
   state = {
-    modalCollection: {},
-    showModal: false
-  };
+    name: "",
+    editingName: {},
+    shareModalCollection: {},
+    renameModalCollection: {},
+    showShareModal: false,
+    showRenameModal: false,
+  }
 
   constructor(props) {
-    super(props);
+    super(props)
     //Add invited collection by url param to localstorage
-    const urlParams = new URLSearchParams(window.location.search);
-    const invitedCollection = urlParams.get("invitedCollection");
-    let collectionIds = localStorage.getItem("collectionIds") || "[]";
+    const urlParams = new URLSearchParams(window.location.search)
+    const invitedCollection = urlParams.get("invitedCollection")
+    let collectionIds = localStorage.getItem("collectionIds") || "[]"
     if (invitedCollection) {
-      collectionIds = JSON.parse(collectionIds);
+      collectionIds = JSON.parse(collectionIds)
       if (!collectionIds.includes(invitedCollection))
-        collectionIds.push(invitedCollection);
-      collectionIds = JSON.stringify(collectionIds);
-      localStorage.setItem("collectionIds", collectionIds);
+        collectionIds.push(invitedCollection)
+      collectionIds = JSON.stringify(collectionIds)
+      localStorage.setItem("collectionIds", collectionIds)
     }
     //Subscribe to changes to all owned collections
     socket.emit(
       "initialSubscription",
       JSON.parse(localStorage.getItem("collectionIds"))
-    );
+    )
     //Fetch the collections and load into redux state
-    this.props.fetchCollections(collectionIds);
+    this.props.fetchCollections(collectionIds)
   }
 
   removeFromCollection = (collectionId, restaurantId) => {
@@ -54,9 +60,9 @@ class Collections extends Component {
         //pass
       })
       .catch(function(error) {
-        console.log(error);
-      });
-  };
+        console.log(error)
+      })
+  }
 
   deleteCollection = collectionId => {
     axios
@@ -65,27 +71,54 @@ class Collections extends Component {
       })
       .then(response => {})
       .catch(function(error) {
-        console.log(error);
-      });
-  };
+        console.log(error)
+      })
+  }
 
-  showModal = modalCollection => {
-    this.setState({
-      modalCollection,
-      showModal: true
-    });
-  };
+  renameCollection = collectionId => {
+    const { name } = this.state
+    axios
+      .post("http://localhost:8080/api/RenameRestaurantCollection", {
+        collectionId,
+        name: "lols"
+      })
+      .then(response => {})
+      .catch(function(error) {
+        console.log(error)
+      })
+  }
 
-  closeModal = () => {
+  showShareModal = collection => {
     this.setState({
-      showModal: false
-    });
-  };
+      shareModalCollection: collection,
+      showShareModal: true
+    })
+  }
+
+  closeShareModal = () => {
+    this.setState({
+      showShareModal: false
+    })
+  }
+
+  showRenameModal = collection => {
+    this.setState({
+      renameModalCollection: collection,
+      showRenameModal: true
+    })
+  }
+
+  closeRenameModal = () => {
+    this.setState({
+      showRenameModal: false
+    })
+  }
+
 
   render() {
     return (
       <div>
-        <Container style={{}}>
+        <Container>
           {/*<Row style={{paddingTop:'25px'}}>
 					  <Button style={{fontWeight:'600'}} variant="primary" size="lg" block>
 					  	<FontAwesomeIcon style={{marginRight:'5px'}}icon={faPlus} />
@@ -106,7 +139,20 @@ class Collections extends Component {
                     {collection.name}
                     <FontAwesomeIcon
                       onClick={() => {
-                        this.deleteCollection(collection._id);
+                        this.showRenameModal(collection)
+                      }}
+                      style={{
+                        color: "grey",
+                        cursor: "pointer",
+                        display: "block",
+                        marginRight: "auto",
+                        marginLeft: "8px"
+                      }}
+                      icon={faEdit}
+                    />
+                    <FontAwesomeIcon
+                      onClick={() => {
+                        this.deleteCollection(collection._id)
                       }}
                       style={{
                         color: "red",
@@ -133,7 +179,7 @@ class Collections extends Component {
                             this.removeFromCollection(
                               collection._id,
                               restaurant._id
-                            );
+                            )
                           }}
                           style={{
                             color: "red",
@@ -148,7 +194,7 @@ class Collections extends Component {
                   </ListGroup>
                   <Card.Footer
                     onClick={() => {
-                      this.showModal(collection);
+                      this.showShareModal(collection)
                     }}
                     style={{
                       display: "flex",
@@ -173,26 +219,31 @@ class Collections extends Component {
           </Row>
         </Container>
         <ShareCollectionModal
-          showModal={this.state.showModal}
-          collection={this.state.modalCollection}
-          closeModal={this.closeModal}
+          showModal={this.state.showShareModal}
+          collection={this.state.shareModalCollection}
+          closeModal={this.closeShareModal}
+        />
+        <RenameCollectionModal
+          showModal={this.state.showRenameModal}
+          collection={this.state.renameModalCollection}
+          closeModal={this.closeRenameModal}
         />
       </div>
-    );
+    )
   }
 }
 
 const mapStateToProps = state => ({
   collections: state.collectionReducer.collections
-});
+})
 
 const mapDispatchToProps = dispatch => ({
   fetchCollections: collectionIds => {
-    dispatch(fetchCollections(collectionIds));
+    dispatch(fetchCollections(collectionIds))
   }
-});
+})
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Collections);
+)(Collections)
