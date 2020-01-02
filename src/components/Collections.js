@@ -17,6 +17,8 @@ import ShareCollectionModal from "./ShareCollectionModal"
 import RenameCollectionModal from "./RenameCollectionModal"
 //Socket.io
 import socket from "../socket"
+//Config
+import config from "../config"
 
 class Collections extends Component {
   state = {
@@ -52,7 +54,7 @@ class Collections extends Component {
 
   removeFromCollection = (collectionId, restaurantId) => {
     axios
-      .post("http://localhost:8080/api/RemoveFromRestaurantCollection", {
+      .post(`${config.baseUrl}/api/RemoveFromRestaurantCollection`, {
         collectionId,
         restaurantId
       })
@@ -66,7 +68,7 @@ class Collections extends Component {
 
   deleteCollection = collectionId => {
     axios
-      .post("http://localhost:8080/api/DeleteRestaurantCollection", {
+      .post(`${config.baseUrl}/api/DeleteRestaurantCollection`, {
         collectionId
       })
       .then(response => {})
@@ -78,7 +80,7 @@ class Collections extends Component {
   renameCollection = collectionId => {
     const { name } = this.state
     axios
-      .post("http://localhost:8080/api/RenameRestaurantCollection", {
+      .post(`${config.baseUrl}/api/RenameRestaurantCollection`, {
         collectionId,
         name: "lols"
       })

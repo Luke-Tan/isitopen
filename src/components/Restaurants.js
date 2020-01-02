@@ -10,6 +10,8 @@ import axios from "axios"
 import { connect } from "react-redux"
 //Components
 import AddRestaurantModal from "./AddRestaurantModal"
+//Config
+import config from '../config'
 
 const SECONDS_IN_DAY = 24 * 60 * 60
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -39,7 +41,7 @@ class Restaurants extends Component {
     DAYS.forEach(day => (selectedDays[day] = true))
     this.state.selectedDays = selectedDays
     axios
-      .get("http://localhost:8080/api/GetData")
+      .get(`${config.baseUrl}/api/GetData`)
       .then(response => {
         const { data } = response
         this.setState({

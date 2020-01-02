@@ -3,6 +3,8 @@ import { Modal, Button, Form } from "react-bootstrap"
 
 import axios from "axios"
 
+import config from "../config"
+
 export default class ShareCollectionModal extends Component {
   state = {
     name: '',
@@ -28,7 +30,7 @@ export default class ShareCollectionModal extends Component {
     console.log(collectionId)
     console.log(name)
     axios
-      .post("http://localhost:8080/api/RenameRestaurantCollection", {
+      .post(`${config.baseUrl}/api/RenameRestaurantCollection`, {
         collectionId,
         name
       })

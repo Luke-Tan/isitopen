@@ -3,6 +3,8 @@ import { Modal, Button, Form } from "react-bootstrap"
 
 import axios from "axios"
 
+import config from "../config"
+
 export default class ShareCollectionModal extends Component {
   state = {
     emailRecipients: [""],
@@ -28,7 +30,7 @@ export default class ShareCollectionModal extends Component {
     const { emailRecipients } = this.state
     const { collection } = this.props
     axios
-      .post("http://localhost:8080/api/InviteFriends", {
+      .post(`${config.baseUrl}/api/InviteFriends`, {
         emails: emailRecipients,
         collection
       })

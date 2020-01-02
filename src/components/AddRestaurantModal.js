@@ -3,6 +3,7 @@ import { Modal, ListGroup, Form, Button } from "react-bootstrap"
 import axios from "axios"
 import { connect } from "react-redux"
 import { createCollection } from "../actions/collectionAction"
+import config from '../config'
 
 class AddRestaurantModal extends Component {
   state = {
@@ -38,7 +39,7 @@ class AddRestaurantModal extends Component {
       if (checkboxes[key]) collectionIds.push(key)
     }
     axios
-      .post("http://localhost:8080/api/AddToRestaurantCollections", {
+      .post(`${config.baseUrl}/api/AddToRestaurantCollections`, {
         collectionIds: JSON.stringify(collectionIds),
         restaurantId: id
       })
@@ -75,7 +76,7 @@ class AddRestaurantModal extends Component {
                 horizontal
                 style={{ height: "38px", flex: 1, marginTop: "10px" }}
               >
-                <ListGroup.Item style={{ flex: 1 }}>{name}</ListGroup.Item>
+                <ListGroup.Item style={{ flex: 1 , padding: '0.4rem 0.75rem'}}>{name}</ListGroup.Item>
                 <ListGroup.Item
                   style={{
                     display: "flex",

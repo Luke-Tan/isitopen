@@ -12,6 +12,8 @@ import axios from "axios"
 
 import socket from "../socket"
 
+import config from '../config'
+
 export const removedFromCollection = data => {
   const { collectionId, restaurantId } = data
   return {
@@ -64,7 +66,7 @@ export const deletedCollection = data => {
 
 export const createCollection = (name, restaurantId) => dispatch => {
   axios
-    .post("http://localhost:8080/api/CreateRestaurantCollection", {
+    .post(`${config.baseUrl}/api/CreateRestaurantCollection`, {
       name,
       restaurantId
     })
@@ -89,7 +91,7 @@ export const createCollection = (name, restaurantId) => dispatch => {
 
 export const fetchCollections = collectionIds => dispatch => {
   axios
-    .get("http://localhost:8080/api/GetRestaurantCollections", {
+    .get(`${config.baseUrl}/api/GetRestaurantCollections`, {
       params: {
         collectionIds: collectionIds
       }
