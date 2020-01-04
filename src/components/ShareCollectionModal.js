@@ -7,7 +7,7 @@ import config from "../config"
 
 export default class ShareCollectionModal extends Component {
   state = {
-    emailRecipients: [""],
+    emailRecipients: [""]
   }
 
   addEmailRecipient = () => {

@@ -12,7 +12,7 @@ import axios from "axios"
 
 import socket from "../socket"
 
-import config from '../config'
+import config from "../config"
 
 export const removedFromCollection = data => {
   const { collectionId, restaurantId } = data

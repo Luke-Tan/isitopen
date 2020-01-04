@@ -27,7 +27,7 @@ class Collections extends Component {
     shareModalCollection: {},
     renameModalCollection: {},
     showShareModal: false,
-    showRenameModal: false,
+    showRenameModal: false
   }
 
   constructor(props) {
@@ -115,7 +115,6 @@ class Collections extends Component {
       showRenameModal: false
     })
   }
-
 
   render() {
     return (

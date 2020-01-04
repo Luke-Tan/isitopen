@@ -7,9 +7,8 @@ import config from "../config"
 
 export default class ShareCollectionModal extends Component {
   state = {
-    name: '',
+    name: ""
   }
-
 
   handleNameChange = event => {
     this.setState({
@@ -43,7 +42,11 @@ export default class ShareCollectionModal extends Component {
 
   render() {
     return (
-      <Modal onEnter={this.setName} show={this.props.showModal} onHide={this.props.closeModal}>
+      <Modal
+        onEnter={this.setName}
+        show={this.props.showModal}
+        onHide={this.props.closeModal}
+      >
         <Modal.Header closeButton>
           <Modal.Title>{`Rename collection`}</Modal.Title>
         </Modal.Header>

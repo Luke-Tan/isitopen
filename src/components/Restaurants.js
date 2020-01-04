@@ -11,7 +11,7 @@ import { connect } from "react-redux"
 //Components
 import AddRestaurantModal from "./AddRestaurantModal"
 //Config
-import config from '../config'
+import config from "../config"
 
 const SECONDS_IN_DAY = 24 * 60 * 60
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -44,6 +44,7 @@ class Restaurants extends Component {
       .get(`${config.baseUrl}/api/GetData`)
       .then(response => {
         const { data } = response
+        console.log(data);
         this.setState({
           items: data,
           filteredRestaurants: data

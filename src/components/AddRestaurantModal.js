@@ -3,13 +3,13 @@ import { Modal, ListGroup, Form, Button } from "react-bootstrap"
 import axios from "axios"
 import { connect } from "react-redux"
 import { createCollection } from "../actions/collectionAction"
-import config from '../config'
+import config from "../config"
 
 class AddRestaurantModal extends Component {
   state = {
     checkboxes: {}
   }
-
+  
   closeAddRestaurantModal = () => {
     this.setState({
       checkboxes: {}
@@ -19,7 +19,6 @@ class AddRestaurantModal extends Component {
   handleChange = event => {
     const { checkboxes } = this.state
     const { id } = event.target.dataset
-    console.log(id)
     const { checked } = event.target
     this.setState({
       checkboxes: {
@@ -59,7 +58,7 @@ class AddRestaurantModal extends Component {
 
   render() {
     return (
-      <Modal show={this.props.showModal} onHide={this.props.closeModal}>
+      <Modal onEnter={this.setCheckboxes} show={this.props.showModal} onHide={this.props.closeModal}>
         <Modal.Header closeButton>
           <Modal.Title>{this.props.title}</Modal.Title>
         </Modal.Header>
@@ -76,7 +75,9 @@ class AddRestaurantModal extends Component {
                 horizontal
                 style={{ height: "38px", flex: 1, marginTop: "10px" }}
               >
-                <ListGroup.Item style={{ flex: 1 , padding: '0.4rem 0.75rem'}}>{name}</ListGroup.Item>
+                <ListGroup.Item style={{ flex: 1, padding: "0.4rem 0.75rem" }}>
+                  {name}
+                </ListGroup.Item>
                 <ListGroup.Item
                   style={{
                     display: "flex",
